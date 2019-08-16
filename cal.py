@@ -1,0 +1,41 @@
+
+# Filename: cal.py
+# Aim: to write the telescope cal to the fits data file.
+
+import numpy as np
+from astropy.io import fits
+
+def getcal(calon,caloff,expose,leng):
+
+    period = int((calon + caloff)/expose)
+    N = int(leng/period)+1
+
+    cal_p = np.zeros(period,dtype=bool)
+    cal_p[0:calon] = 1
+    calarr = np.tile(cal_p,N)
+    calstat = calarr[0:leng]
+
+    return calstat
+
+def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='high'):
+
+
+    if not ('CALTYPE' in hdul[1].header):
+
+        leng = hdul[1].header['NAXIS2']
+        calstat = getcal(calon,caloff,expose,leng)
+    
+        hdul[1].header.append(('CALTYPE',caltype))
+        hdul[1].header['TFIELDS'] = 22
+        hdul[1].header.append(('TTYPE22','CALSTAT'))
+        hdul[1].header.append(('TFORM22','1L','Logical'))
+    
+        new_col = fits.Column(name='CALSTAT',format='1L',array=calstat)
+        newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
+        hdul[1].data = newhdu.data
+        hdul.flush()
+
+        return 1
+    else:
+        return 0
+

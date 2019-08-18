@@ -15,7 +15,7 @@ def csv_load(filename,delimiter=',', beam=1):
     az=[]
     el=[]
 
-    beamstr = '{:02I}'.format(beam)
+    beamstr = '{:02d}'.format(beam)
 
     with open(filename,'rt') as filein:
 
@@ -38,18 +38,16 @@ def utc2mjd(obs_utc):
 
 def radec2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
 
-    tab = csv_load(file_tab,delimiter=delimiter,beam=beam)
+    tab = csv_load(file_coor,delimiter=delimiter,beam=beam)
     tab_mjd = tab[0,:]
     tab_ra = tab[1,:]
     tab_dec = tab[2,:]
    
-    obs_utc = hdul[1].data['DATA-OBS']
+    obs_utc = hdul[1].data['DATE-OBS']
     obs_mjd = utc2mjd(obs_utc) 
 
     for i in range(len(obs_mjd)):
         ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
-        if len(ind) != 1:
-            ind = ind[-1]
         hdul[1].data['OBJ_RA'][i] = tab_ra[ind]
         hdul[1].data['OBJ_DEC'][i] = tab_dec[ind]
 
@@ -75,16 +73,14 @@ def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
 
         for i in range(len(obs_mjd)):
             ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
-            if len(ind) != 1:
-                ind = ind[-1]
             obs_az.append(tab_az[ind])
             obs_el.append(tab_el[ind])
-
-        hdul[1].header['TFIELDS'] = 24
-        hdul[1].header.append(('TTYPE23','AZ'))
-        hdul[1].header.append(('TFORM23','1D'))
-        hdul[1].header.append(('TTYPE24','EL'))
-        hdul[1].header.append(('TFORM24','1D'))
+## No need to update the header by hand, the HDU will do automatically.
+#        hdul[1].header['TFIELDS'] = 24
+#        hdul[1].header.append(('TTYPE23','AZ'))
+#        hdul[1].header.append(('TFORM23','1D'))
+#        hdul[1].header.append(('TTYPE24','EL'))
+#        hdul[1].header.append(('TFORM24','1D'))
 
         col_az = fits.Column(name='AZ',format='1D',array=obs_az)
         col_el = fits.Column(name='EL',format='1D',array=obs_el)

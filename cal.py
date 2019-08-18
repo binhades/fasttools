@@ -26,11 +26,8 @@ def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='high'):
         calstat = getcal(calon,caloff,expose,leng)
     
         hdul[1].header.append(('CALTYPE',caltype))
-        hdul[1].header['TFIELDS'] = 22
-        hdul[1].header.append(('TTYPE22','CALSTAT'))
-        hdul[1].header.append(('TFORM22','1L','Logical'))
-    
         new_col = fits.Column(name='CALSTAT',format='1L',array=calstat)
+
         newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
         hdul[1].data = newhdu.data
         hdul.flush()

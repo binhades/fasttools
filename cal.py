@@ -20,12 +20,13 @@ def getcal(calon,caloff,expose,leng):
 def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='high'):
 
 
-    if not ('CALTYPE' in hdul[1].header):
+    if (not ('CALTYPE' in hdul[1].header)) or hdul[1].header['CALTYPE'] == '':
 
         leng = hdul[1].header['NAXIS2']
         calstat = getcal(calon,caloff,expose,leng)
     
-        hdul[1].header.append(('CALTYPE',caltype))
+        #hdul[1].header.append(('CALTYPE',caltype))
+        hdul[1].header['CALTYPE'] = caltype
         new_col = fits.Column(name='CALSTAT',format='1L',array=calstat)
 
         newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))

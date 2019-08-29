@@ -56,6 +56,8 @@ def radec2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
     return 0
 
 def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
+    
+    print('This function is not finished: azel2fits in coow2fits, fasttools/coor/')
 
 
     tab = csv_load(file_tab,delimiter=delimiter,beam=beam)

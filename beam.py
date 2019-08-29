@@ -4,7 +4,7 @@
 
 def beam2fits(hdul,beam=1):
 
-    if not ('BEAMNUM' in hdul[1].header):
+    if (not ('BEAMNUM' in hdul[1].header)) or hdul[1].header['BEAMNUM'] == -1:
 
         hdul[1].header.append(('BEAMNUM',beam))
         hdul.flush()

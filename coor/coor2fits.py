@@ -71,18 +71,10 @@ def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
     obs_az = []
     obs_el = []
 
-    if hdul[1].header['TFIELDS'] < 23: 
-
-        for i in range(len(obs_mjd)):
-            ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
-            obs_az.append(tab_az[ind])
-            obs_el.append(tab_el[ind])
-## No need to update the header by hand, the HDU will do automatically.
-#        hdul[1].header['TFIELDS'] = 24
-#        hdul[1].header.append(('TTYPE23','AZ'))
-#        hdul[1].header.append(('TFORM23','1D'))
-#        hdul[1].header.append(('TTYPE24','EL'))
-#        hdul[1].header.append(('TFORM24','1D'))
+    for i in range(len(obs_mjd)):
+        ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
+        obs_az.append(tab_az[ind])
+        obs_el.append(tab_el[ind])
 
         col_az = fits.Column(name='AZ',format='1D',array=obs_az)
         col_el = fits.Column(name='EL',format='1D',array=obs_el)

@@ -8,11 +8,9 @@ from astropy.coordinates import *
 from astropy import units as u
 from astropy.time import Time
 
-#from astropy.utils import iers 
 ## to replace the default url to : http://maia.usno.navy.mil/ser7/finals2000A.all
-#iers.IERS_A_URL = 'http://jlrat.bao.ac.cn/~bliu/doc/finals2000A.all'
-#iers.conf.auto_download = False
-#iers.IERS.iers_table = iers.IERS_A.open(iers.IERS_A_URL)
+from astropy.utils import iers 
+iers.conf.iers_auto_url =  'http://jlrat.bao.ac.cn/~bliu/doc/finals2000A.all'
     
 def xyz2azel(x,y,z):
     # check if x,y,z are scalars or 1d array with same length.

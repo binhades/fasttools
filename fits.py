@@ -1,12 +1,23 @@
 
-# Filename: coor2fits.py
-# Aim: to write the telescope pointing to the fits data file.
+# Filename: fits.py
+# Aim: to re-write the FAST fits (ver:0.7) to the prefered fits data format.
 
 import sys,csv
 import numpy as np
 from astropy.time import Time
-from astropy.io import fits
+from astropy.io import fits as pyfits
 
+class LBFITS():
+    def init(filein):
+
+        try:
+            ihdul = pyfits.open(filein)
+        except FileNotFoundError:
+            print("ERROR: LBFITS load FILE NOT FOUND - %S" % fname)
+            return -1
+        
+
+        return 0
 def csv_load(filename,delimiter=',', beam=1):
 
     mjd=[]
@@ -57,36 +68,40 @@ def radec2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
 
 def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
     
-<<<<<<< HEAD
-    tab = csv_load(file_tab,delimiter=delimiter,beam=beam)
-=======
     print('This function is not finished: azel2fits in coow2fits, fasttools/coor/')
 
 
-    tab = csv_load(file_coor,delimiter=delimiter,beam=beam)
->>>>>>> 5e56c8d160ff252b65c51c1f0f699be3f1481aee
+    tab = csv_load(file_tab,delimiter=delimiter,beam=beam)
     tab_mjd = tab[0,:]
     tab_az = tab[3,:]
     tab_el = tab[4,:]
    
-    obs_utc = hdul[1].data['DATE-OBS']
+    obs_utc = hdul[1].data['DATA-OBS']
     obs_mjd = utc2mjd(obs_utc) 
 
     obs_az = []
     obs_el = []
 
-    for i in range(len(obs_mjd)):
-        ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
-        obs_az.append(tab_az[ind])
-        obs_el.append(tab_el[ind])
+    if hdul[1].header['TFIELDS'] < 23: 
 
-    col_az = fits.Column(name='AZ',format='1D',array=obs_az)
-    col_el = fits.Column(name='EL',format='1D',array=obs_el)
-    newcols = hdul[1].columns + fits.ColDefs([col_az,col_el])
-    newhdu = fits.BinTableHDU.from_columns(newcols)
-    hdul[1].data = newhdu.data
+        for i in range(len(obs_mjd)):
+            ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
+            obs_az.append(tab_az[ind])
+            obs_el.append(tab_el[ind])
+## No need to update the header by hand, the HDU will do automatically.
+#        hdul[1].header['TFIELDS'] = 24
+#        hdul[1].header.append(('TTYPE23','AZ'))
+#        hdul[1].header.append(('TFORM23','1D'))
+#        hdul[1].header.append(('TTYPE24','EL'))
+#        hdul[1].header.append(('TFORM24','1D'))
 
-    hdul.flush()
+        col_az = fits.Column(name='AZ',format='1D',array=obs_az)
+        col_el = fits.Column(name='EL',format='1D',array=obs_el)
+        newcols = hdul[1].columns + fits.ColDefs([col_az,col_el])
+        newhdu = fits.BinTableHDU.from_columns(newcols)
+        hdul[1].data = newhdu.data
+
+        hdul.flush()
 
     return 0
 

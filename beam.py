@@ -13,26 +13,28 @@ def beam2fits(hdul,beam=1):
 def beam_eff(beam=1,ZA=0,freq=None): # apply the frequency at 1400
     if beam == 1:
         a = -4.66e-4
-        b = 6.57
-        c = -1.24
+        b = 6.57e-1
+        c = -1.24e-2
     elif beam in [2,3,4,5,6,7]:
         a = 0.02e-4
-        b = 6.31
-        c = -1.32
+        b = 6.31e-1
+        c = -1.32e-2
     elif beam in [8,10,12,14,16,18]:
-        a = 2.66
-        b = 5.80
-        c = -1.38
+        a = 2.66e-4
+        b = 5.80e-1
+        c = -1.38e-2
     elif beam in [9,11,13,15,17,19]:
-        a = 12.00
-        b = 5.53
-        c = -1.31
+        a = 12.00e-4
+        b = 5.53e-1
+        c = -1.31e-2
     d = b+26.4*(a-c)
 
     if ZA < 26.4:
-        return a*ZA+b
+        eff=a*ZA+b
     else:
-        return c*ZA+d
+        eff=c*ZA+d
+
+    return eff
 
 def beam_gain(beam_eff,gain0=25.2): # K/Jy
 

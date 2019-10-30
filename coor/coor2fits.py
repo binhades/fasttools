@@ -73,16 +73,15 @@ def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
         obs_az.append(tab_az[ind])
         obs_el.append(tab_el[ind])
 
-    try:
+    if 'AZ' in hdul[1].columns.names:
+        hdul[1].data['AZ'] = obs_az
+        hdul[1].data['EL'] = obs_el
+    else:
         col_az = fits.Column(name='AZ',format='1D',array=obs_az)
         col_el = fits.Column(name='EL',format='1D',array=obs_el)
-    except(ValueError):
-        print('AZ or EL exist in the file')
-        return 0
-
-    newcols = hdul[1].columns + fits.ColDefs([col_az,col_el])
-    newhdu = fits.BinTableHDU.from_columns(newcols)
-    hdul[1].data = newhdu.data
+        newcols = hdul[1].columns + fits.ColDefs([col_az,col_el])
+        newhdu = fits.BinTableHDU.from_columns(newcols)
+        hdul[1].data = newhdu.data
 
     hdul.flush()
 

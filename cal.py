@@ -9,7 +9,6 @@ def getcal(calon,caloff,expose,leng):
 
     period = int((calon + caloff)/expose)
     N = int(leng/period)+1
-
     cal_p = np.zeros(period,dtype=bool)
     cal_p[0:calon] = 1
     calarr = np.tile(cal_p,N)
@@ -19,21 +18,16 @@ def getcal(calon,caloff,expose,leng):
 
 def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='high'):
 
-
-    if (not ('CALTYPE' in hdul[1].header)) or hdul[1].header['CALTYPE'] == '':
-
-        leng = hdul[1].header['NAXIS2']
-        calstat = getcal(calon,caloff,expose,leng)
-    
-        #hdul[1].header.append(('CALTYPE',caltype))
-        hdul[1].header['CALTYPE'] = caltype
+    leng = hdul[1].header['NAXIS2']
+    calstat = getcal(calon,caloff,expose,leng)
+    hdul[1].header['CALTYPE'] = caltype
+    if 'CALSTAT' in hdul[1].columns.names:
+        hdul[1].data['CALSTAT'] = calstat
+    else:
         new_col = fits.Column(name='CALSTAT',format='1L',array=calstat)
-
         newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
         hdul[1].data = newhdu.data
-        hdul.flush()
+    hdul.flush()
 
-        return 1
-    else:
-        return 0
+    return 1
 

@@ -7,10 +7,13 @@ from astropy.io import fits
 
 def getcal(calon,caloff,expose,leng):
 
-    period = int((calon + caloff)/expose)
+    len_on =  int(calon/expose)
+    len_off =  int(caloff/expose)
+    period = int(len_on+len_off)
+
     N = int(leng/period)+1
     cal_p = np.zeros(period,dtype=bool)
-    cal_p[0:calon] = 1
+    cal_p[0:len_on] = True
     calarr = np.tile(cal_p,N)
     calstat = calarr[0:leng]
 

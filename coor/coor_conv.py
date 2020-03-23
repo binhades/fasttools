@@ -2,17 +2,21 @@
 # Filename: coor_conv.py
 # Aim: to convert the XYZ to RaDec
 
-import sys,os,glob,datetime,csv
-import numpy as np
-from astropy.coordinates import *
+#import sys,os,glob,datetime,csv
+#from astropy.coordinates import *
+#import numpy as np
+
+from astropy.coordinates import SkyCoord
 from astropy import units as u
 from astropy.time import Time
+from ..location import get_fast_location
 
 ## to replace the default url to : http://maia.usno.navy.mil/ser7/finals2000A.all
 from astropy.utils import iers 
 iers.conf.iers_auto_url =  'http://jlrat.bao.ac.cn/~bliu/doc/finals2000A.all'
     
 def xyz2azel(x,y,z):
+    import numpy as np
     # check if x,y,z are scalars or 1d array with same length.
     R = np.sqrt(x**2+y**2+z**2)
     az = np.degrees(np.arctan2(-x, -y))
@@ -32,10 +36,11 @@ def xyz2azel(x,y,z):
 
 def radec2azel(ra,dec,mjd):
 
-    fast_lon = 106.85645657571428*u.deg
-    fast_lat = 25.6534387*u.deg
-    fast_alt = 1138.72178*u.m
-    fast_loc = EarthLocation(lat=fast_lat, lon=fast_lon, height=fast_alt)
+#    fast_lon = 106.85645657571428*u.deg
+#    fast_lat = 25.6534387*u.deg
+#    fast_alt = 1138.72178*u.m
+#    fast_loc = EarthLocation(lat=fast_lat, lon=fast_lon, height=fast_alt)
+    fast_loc = get_fast_location()
 
     obswl = 21 * u.cm
     temperature = 25 * u.deg_C
@@ -54,10 +59,11 @@ def radec2azel(ra,dec,mjd):
 
 def azel2radec(az,el,mjd):
 
-    fast_lon = 106.85645657571428*u.deg
-    fast_lat = 25.6534387*u.deg
-    fast_alt = 1138.72178*u.m
-    fast_loc = EarthLocation(lat=fast_lat, lon=fast_lon, height=fast_alt)
+#    fast_lon = 106.85645657571428*u.deg
+#    fast_lat = 25.6534387*u.deg
+#    fast_alt = 1138.72178*u.m
+#    fast_loc = EarthLocation(lat=fast_lat, lon=fast_lon, height=fast_alt)
+    fast_loc = get_fast_location()
 
     obswl = 21 * u.cm
     temperature = 25 * u.deg_C
@@ -83,6 +89,7 @@ def coor_conv(mjd,x,y,z):
 
 #----------------------------------
 if __name__ == '__main__':
+    import sys
     if len(sys.argv)<4:
 
         print('input x,y,z')

@@ -40,4 +40,7 @@ def beam_gain(beam_eff,gain0=25.2): # K/Jy
 
     return beam_eff*gain0
 
-
+def get_beam_from_filename(fname):
+    ind = fname.find('_W_')
+    beam = int(fname[ind-2:ind])
+    return beam #TODO

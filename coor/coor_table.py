@@ -58,7 +58,6 @@ def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5365):
     beam[19,1] = beam[0,1] + 2*np.cos(np.pi*1/6)*dist*np.sin(theta+np.pi*1/6)
     beam[19,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*1/6)/np.cos(np.radians(beam[2,1]))
 
-
     return beam
 
 def csv_load(file_xyz,delimiter=','):
@@ -148,7 +147,6 @@ def data2dict(mjd,ra,dec,az,el):
 
     return rows
 
-
 def multi_beam_offset(ra_c,dec_c,mjd,rot):
 
     beam = np.zeros((20,2,len(ra_c)))
@@ -168,9 +166,9 @@ def coor_table(file_xyz,fileout='coor_table.csv',delimiter=',',cb=False,nowt=Fal
 
     data = csv_load(file_xyz,delimiter=delimiter)
     mjd = data[0,:]
-    x = data[1,:]
-    y = data[2,:]
-    z = data[3,:]
+    x   = data[1,:]
+    y   = data[2,:]
+    z   = data[3,:]
     rot = data[4,:]
 
     ra_c,dec_c,az_c,el_c = coor_conv(mjd,x,y,z)

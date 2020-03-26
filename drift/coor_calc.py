@@ -4,7 +4,7 @@
 
 from numpy import zeros 
 from numpy import array 
-from ..time import utc2lst
+from ..time import utc2lst,utc2mjd
 from ..coor.coor_table import beam_coors, data2dict, csv_write # the last one is used for whold moudal 
 from ..coor.coor_conv import radec2azel
 
@@ -29,5 +29,16 @@ def coor_beam_n(ra_c,dec_c,mjd,rot):
     dec = beam[:,1,:]
     az,el = radec2azel(ra,dec,mjd)
     coor_dict = data2dict(mjd,ra,dec,az,el)
+
+    return coor_dict
+
+def coor_calc(obs_utc, dec=0, hr=0,rot=23.4,file_out='out.csv',nowt=True):
+
+    mjd = utc2mjd(obs_utc)
+    coor_b0   = coor_beam_0(obs_utc, dec=dec, hr=hr)
+    coor_dict = coor_beam_n(coor_b0[0,:],coor_b0[1,:],mjd,rot)
+
+    if not nowt:
+        csv_write(coor_dict,file_out)
 
     return coor_dict

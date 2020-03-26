@@ -3,11 +3,11 @@
 # Aim: to get dec from the drift data path
 # file_str = '/data/fast/drift/Dec+0500/20180919/Dec+0500_drifting-M01_W_0001.fits'
 
-def get_dec(file_str):
+def get_dec(fname):
 
     try:
-        decM = float(str.split(path,'/')[-1][6:8])/60.
-        decD = float(str.split(path,'/')[-1][3:6])
+        decM = float(str.split(fname,'/')[-1][6:8])/60.
+        decD = float(str.split(fname,'/')[-1][3:6])
     except ValueError:
         print("Error: dec get from path")
         return 0

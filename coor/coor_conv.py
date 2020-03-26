@@ -6,7 +6,7 @@
 #from astropy.coordinates import *
 #import numpy as np
 
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import SkyCoord, AltAz
 from astropy import units as u
 from astropy.time import Time
 from ..location import get_fast_location
@@ -36,10 +36,6 @@ def xyz2azel(x,y,z):
 
 def radec2azel(ra,dec,mjd):
 
-#    fast_lon = 106.85645657571428*u.deg
-#    fast_lat = 25.6534387*u.deg
-#    fast_alt = 1138.72178*u.m
-#    fast_loc = EarthLocation(lat=fast_lat, lon=fast_lon, height=fast_alt)
     fast_loc = get_fast_location()
 
     obswl = 21 * u.cm
@@ -59,10 +55,6 @@ def radec2azel(ra,dec,mjd):
 
 def azel2radec(az,el,mjd):
 
-#    fast_lon = 106.85645657571428*u.deg
-#    fast_lat = 25.6534387*u.deg
-#    fast_alt = 1138.72178*u.m
-#    fast_loc = EarthLocation(lat=fast_lat, lon=fast_lon, height=fast_alt)
     fast_loc = get_fast_location()
 
     obswl = 21 * u.cm

@@ -68,7 +68,7 @@ def azel2fits(hdul,beam=1,tab):
 def coor2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
 
     tab = csv_load(file_coor,delimiter=delimiter,beam=beam)
-    radec2fits(hdul,tab):
+    radec2fits(hdul,tab)
     azel2fits(hdul,tab)
 
     #hdul.flush() # TODO

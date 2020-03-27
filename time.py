@@ -2,10 +2,10 @@
 # Filename: time.py
 # Aim: to convert utc to mjd or lst at location of the FAST site
 
-from astropy.time import Time
-from .location import get_fast_location
 
 def fast_time(obs_utc,scale='utc',format='isot'):
+    from astropy.time import Time
+    from .location import get_fast_location
 
     fast_loc = get_fast_location()
     t = Time(obs_utc,scale=scale,format=format,location=fast_loc)
@@ -26,6 +26,8 @@ def utc2lst(obs_utc,scale='utc',format='isot'):
     return lst
 
 def mjd2fits(hdul):
+
+    from astropy.io import fits
 
     obs_utc = hdul[1].data['DATE-OBS']
     obs_mjd = utc2mjd(obs_utc)

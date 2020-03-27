@@ -2,33 +2,8 @@
 # Filename: coor2fits.py
 # Aim: to write the telescope pointing to the fits data file.
 
-import csv
 from astropy.io import fits
 from ..coor.coor2fits import csv_load
-
-def csv_load(filename,delimiter=',', beam=1):
-
-    mjd=[]
-    ra=[]
-    dec=[]
-    az=[]
-    el=[]
-
-    beamstr = '{:02d}'.format(beam)
-
-    with open(filename,'rt') as filein:
-
-        reader = csv.DictReader(filein,delimiter=delimiter)
-        headers= reader.fieldnames
-        for row in reader:
-            mjd.append(float(row['mjd']))
-            ra.append(float(row['ra_m'+beamstr]))
-            dec.append(float(row['dec_m'+beamstr]))
-            az.append(float(row['az_m'+beamstr]))
-            el.append(float(row['el_m'+beamstr]))
-
-    return np.array([mjd,ra,dec,az,el])
-
 
 def radec2fits(hdul,tab):
 
@@ -71,6 +46,6 @@ def coor2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
     radec2fits(hdul,tab)
     azel2fits(hdul,tab)
 
-    #hdul.flush() # TODO
+    hdul.flush()
 
     return 0

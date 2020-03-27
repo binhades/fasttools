@@ -30,7 +30,7 @@ def csv_load(filename,delimiter=',', beam=1):
     return np.array([mjd,ra,dec,az,el])
 
 
-def radec2fits(hdul,beam=1,tab):
+def radec2fits(hdul,tab):
 
     tab_mjd = tab[0,:]
     tab_ra = tab[1,:]
@@ -47,7 +47,7 @@ def radec2fits(hdul,beam=1,tab):
 
     return 0
 
-def azel2fits(hdul,beam=1,tab):
+def azel2fits(hdul,tab):
     
     tab_mjd = tab[0,:]
     tab_az = tab[3,:]

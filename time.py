@@ -33,9 +33,9 @@ def mjd2fits(hdul):
     obs_mjd = utc2mjd(obs_utc)
 
     if 'MJD' in hdul[1].columns.names:
-        hdul[1].data['MJD'] = mjd
+        hdul[1].data['MJD'] = obs_mjd
     else:
-        new_col = fits.Column(name='MJD',format='1D',array=calstat)
+        new_col = fits.Column(name='MJD',format='1D',array=obs_mjd)
         newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
         hdul[1].data = newhdu.data
 

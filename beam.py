@@ -3,12 +3,13 @@
 # Aim: to write the telescope beam to the fits data file.
 
 def beam2fits(hdul,beam=1):
-    if (not ('BEAMNUM' in hdul[1].header)) or hdul[1].header['BEAMNUM'] == -1:
+    if (not ('BEAMNUM' in hdul[1].header)):
         hdul[1].header.append(('BEAMNUM',beam))
-        hdul.flush()
-        return 1
     else:
-        return 0
+        hdul[1].header['BEAMNUM'] = beam
+
+    hdul.flush()
+    return 1
 
 def beam_eff(beam=1,ZA=0,freq=None): # apply the frequency at 1400
     if beam == 1:
@@ -37,7 +38,6 @@ def beam_eff(beam=1,ZA=0,freq=None): # apply the frequency at 1400
     return eff
 
 def beam_gain(beam_eff,gain0=25.2): # K/Jy
-
     return beam_eff*gain0
 
 def get_beam_from_filename(fname,type='raw'):

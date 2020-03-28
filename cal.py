@@ -11,7 +11,7 @@ def getcal(calon,caloff,leng):
     N = int(leng/period)+1
 
     cal_p = np.zeros(period,dtype=bool)
-    cal_p[0:len_on] = True
+    cal_p[0:calon] = True
     calarr = np.tile(cal_p,N)
     calstat = calarr[0:leng]
 

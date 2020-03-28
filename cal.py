@@ -5,13 +5,11 @@
 import numpy as np
 from astropy.io import fits
 
-def getcal(calon,caloff,expose,leng):
+def getcal(calon,caloff,leng):
 
-    len_on =  int(calon/expose)
-    len_off =  int(caloff/expose)
-    period = int(len_on+len_off)
-
+    period = calon+caloff
     N = int(leng/period)+1
+
     cal_p = np.zeros(period,dtype=bool)
     cal_p[0:len_on] = True
     calarr = np.tile(cal_p,N)
@@ -19,29 +17,26 @@ def getcal(calon,caloff,expose,leng):
 
     return calstat
 
-def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='high'):
+def cal2fits(hdul,calon=1,caloff=1,caltype='high'):
 
     if (not ('CALTYPE' in hdul[1].header)):
-
         hdul[1].header.append(('CALTYPE',caltype))
-#        hdul[1].header['CALTYPE'] = caltype
-        leng = hdul[1].header['NAXIS2']
-        calstat = getcal(calon,caloff,expose,leng)
+    else:
+        hdul[1].header['CALTYPE'] = caltype
 
-        if 'CALSTAT' in hdul[1].columns.names:
+    leng = hdul[1].header['NAXIS2']
+    calstat = getcal(calon,caloff,leng)
 
-            hdul[1].data['CALSTAT'] = calstat
+    if 'CALSTAT' in hdul[1].columns.names:
 
-        else:
-
-            new_col = fits.Column(name='CALSTAT',format='1L',array=calstat)
-            newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
-            hdul[1].data = newhdu.data
-
-        hdul.flush()
-        return 1
+        hdul[1].data['CALSTAT'] = calstat
 
     else:
 
-        return 0
+        new_col = fits.Column(name='CALSTAT',format='1L',array=calstat)
+        newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
+        hdul[1].data = newhdu.data
+
+    hdul.flush()
+    return 1
 

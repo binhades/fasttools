@@ -3,7 +3,7 @@
 # Aim: to write the telescope beam to the fits data file.
 
 import numpy as np
-import csv
+import os, csv
 
 def get_beam_from_filename(fname,type='raw'):
     if type == 'raw':
@@ -41,7 +41,8 @@ def beam_size(beam=1,frequency=1400.,plot=False):
     if frequency < 1000 or frequency > 1500:
         print("Frequency {:f} is out of range".format(frequency))
         return None
-    with open('./beam_size.csv','rt') as filein:
+    file_beam = os.path.join(os.path.dirname(__file__),'beam_size.csv')
+    with open(file_beam,'rt') as filein:
         reader = csv.reader(filein, delimiter=',')
         header = reader.__next__()
         freq_arr = np.array(header[1:]).astype(np.float)
@@ -67,6 +68,11 @@ def beam_size(beam=1,frequency=1400.,plot=False):
     return bf(lambda0)
 
 def aperture_eff(beam=1, ZA=0, frequency=1400.,plot=False):
+
+    def eff4za(za, a, b, c, d):
+        return np.select([za<26.4, za>=26.4],[a*za+b,c*za+d])
+    eff4za_ufunc = np.frompyfunc(eff4za,5,1)
+
     bid = int(beam)
     if bid < 1 or bid > 19:
         print("BeamID {:d} is not correct".format(bid))
@@ -74,7 +80,8 @@ def aperture_eff(beam=1, ZA=0, frequency=1400.,plot=False):
     if frequency < 1000 or frequency > 1500:
         print("Frequency {:f} is out of range".format(frequency))
         return None
-    with open('./aper_effi_para.csv','rt') as filein:
+    file_aper = os.path.join(os.path.dirname(__file__),'aper_effi_para.csv')
+    with open(file_aper,'rt') as filein:
         reader = csv.reader(filein, delimiter=',')
         header = reader.__next__()
         freq_arr = np.array(header[1:]).astype(np.float)
@@ -101,24 +108,20 @@ def aperture_eff(beam=1, ZA=0, frequency=1400.,plot=False):
     c0 = np.polynomial.chebyshev.chebval(frequency, pcc) * 1e-2
     d0 = b0+26.4*(a0-c0)
 
-    if ZA < 26.4:
-        eff=a0*ZA+b0
-    else:
-        eff=c0*ZA+d0
+    eff = eff4za_ufunc(ZA,a0,b0,c0,d0)
+    eff = eff.astype(np.float)
+
+#    if ZA < 26.4:
+#        eff=a0*ZA+b0
+#    else:
+#        eff=c0*ZA+d0
 
     if plot:
         import matplotlib.pyplot as plt
-        def get_ne(za, a0, b0, c0, d0):
-            if za < 26.4:
-                return a0*za+b0
-            else:
-                return c0*za+d0
 
         za_arr = np.arange(0,40,0.1)
-        ne_arr = []
-        for za in za_arr:
-            ne_arr.append(get_ne(za,a0,b0,c0,d0))
-        ne_arr = np.array(ne_arr)
+        ne_arr = eff4za_ufunc(za_arr,a0,b0,c0,d0)
+        ne_arr.astype(np.float)
         plt.plot(za_arr, ne_arr)
         plt.show()
 
@@ -159,7 +162,7 @@ def aperture_eff(beam=1, ZA=0, frequency=1400.,plot=False):
 # ------------------------------------------------------------------------
 
 
-def Sv_to_Tmb(Sv, beam=1, frequency=frequency):
+def Sv_to_Tmb(Sv, beam=1, frequency=1400.):
     lam = 299792458./(1e6*frequency)
     theta = beam_size(beam=beam,frequency=frequency)/60. * np.pi/180.
     omega = np.pi/4.*np.log(2) * (theta)**2
@@ -167,7 +170,7 @@ def Sv_to_Tmb(Sv, beam=1, frequency=frequency):
 
     return Tmb
 
-def Tmb_to_Sv(Tmb, beam=1, frequency=frequency):
+def Tmb_to_Sv(Tmb, beam=1, frequency=1400.):
     lam = 299792458./(1e6*frequency)
     theta = beam_size(beam=beam,frequency=frequency)/60. * np.pi/180.
     omega = np.pi/4.*np.log(2) * (theta)**2

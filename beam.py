@@ -14,20 +14,18 @@ def get_beam_from_filename(fname,type='raw'):
     return beam 
 
 def beam2fits(hdul,beam=1):
-    if (not ('BEAMNUM' in hdul[1].header)):
-        hdul[1].header.append(('BEAMNUM',beam))
+    if (not ('BEAMID' in hdul[1].header)):
+        hdul[1].header.append(('BEAMID',beam))
     else:
-        hdul[1].header['BEAMNUM'] = beam
-
+        hdul[1].header['BEAMID'] = beam
     hdul.flush()
     return 1
 
-def unit2fits(hdul,unit='K',comment='K'):
-    if (not ('BUNIT' in hdul[1].header)):
-        hdul[1].header.append(('BUN299792458/(frequency*1e6IT',unit,comment))
+def unit2fits(hdul,unit='K',comment=None):
+    if (not ('CUNIT2' in hdul[1].header)):
+        hdul[1].header.append(('CUNIT2',unit,comment))
     else:
-        hdul[1].header['BEAMNUM'] = (beam,comment)
-
+        hdul[1].header['CUNIT2'] = (unit,comment)
     hdul.flush()
     return 1
 

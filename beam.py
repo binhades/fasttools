@@ -160,21 +160,27 @@ def aperture_eff(beam=1, ZA=0, frequency=1400.,plot=False):
 # ------------------------------------------------------------------------
 
 
-def Sv_to_Tmb(Sv, beam=1, frequency=1400.):
+def Sv_to_Tmb(Sv, beam=1, frequency=1400.,theta=None):
     lam = 299792458./(1e6*frequency)
-    theta = beam_size(beam=beam,frequency=frequency)/60. * np.pi/180.
-    omega = np.pi/4.*np.log(2) * (theta)**2
-    Tmb = lam**2 * Sv / (2*1.38e-23*omega)
+    if theta is None:
+        theta = beam_size(beam=beam,frequency=frequency)/60. * np.pi/180.
+    else:
+        theta = theta/60. * np.pi/180
+    omega = np.pi/(4.*np.log(2)) * (theta)**2
+    r_tmb_sv = lam**2 / (2*1.38e-23*omega) * 1e-26
 
-    return Tmb
+    return r_tmb_sv * Sv
 
-def Tmb_to_Sv(Tmb, beam=1, frequency=1400.):
+def Tmb_to_Sv(Tmb, beam=1, frequency=1400.,theta=None):
     lam = 299792458./(1e6*frequency)
-    theta = beam_size(beam=beam,frequency=frequency)/60. * np.pi/180.
-    omega = np.pi/4.*np.log(2) * (theta)**2
-    Sv = Tmb * (2*1.38e-23*omega)/lam**2
+    if theta is None:
+        theta = beam_size(beam=beam,frequency=frequency)/60. * np.pi/180.
+    else:
+        theta = theta/60. * np.pi/180
+    omega = np.pi/(4.*np.log(2)) * (theta)**2
+    r_sv_tmb = (2*1.38e-23*omega)/lam**2 * 1e26
 
-    return Sv
+    return r_sv_tmb * Tmb
 
 def main_beam_eff(beam=1, ZA=0, frequency=1400.): # apply the frequency at 1400
     """ Antenna Main-beam Efficiency

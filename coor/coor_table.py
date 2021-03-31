@@ -10,7 +10,7 @@ from .coor_conv import *
 
 def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5365):
 
-    #beam seperate unit in arcmin. 270mm distance to anglar distance
+    #beam seperate unit in degree. 270mm distance to anglar distance
     dist = np.degrees(np.arctan(0.270/(300*fod))) # f/d=0.4611, but scaled to match the measured beam seperation, then need 0.5365
 
     beam = np.zeros((20,2))
@@ -22,41 +22,41 @@ def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5365):
     beam[2,1]  = beam[0,1] + dist*np.sin(theta+np.pi*0/3)
     beam[2,0]  = beam[0,0] + dist*np.cos(theta+np.pi*0/3)/np.cos(np.radians(beam[2,1]))
     beam[3,1]  = beam[0,1] + dist*np.sin(theta+np.pi*5/3)
-    beam[3,0]  = beam[0,0] + dist*np.cos(theta+np.pi*5/3)/np.cos(np.radians(beam[2,1]))
+    beam[3,0]  = beam[0,0] + dist*np.cos(theta+np.pi*5/3)/np.cos(np.radians(beam[3,1]))
     beam[4,1]  = beam[0,1] + dist*np.sin(theta+np.pi*4/3)
-    beam[4,0]  = beam[0,0] + dist*np.cos(theta+np.pi*4/3)/np.cos(np.radians(beam[2,1]))
+    beam[4,0]  = beam[0,0] + dist*np.cos(theta+np.pi*4/3)/np.cos(np.radians(beam[4,1]))
     beam[5,1]  = beam[0,1] + dist*np.sin(theta+np.pi*3/3)
-    beam[5,0]  = beam[0,0] + dist*np.cos(theta+np.pi*3/3)/np.cos(np.radians(beam[2,1]))
+    beam[5,0]  = beam[0,0] + dist*np.cos(theta+np.pi*3/3)/np.cos(np.radians(beam[5,1]))
     beam[6,1]  = beam[0,1] + dist*np.sin(theta+np.pi*2/3)
-    beam[6,0]  = beam[0,0] + dist*np.cos(theta+np.pi*2/3)/np.cos(np.radians(beam[2,1]))
+    beam[6,0]  = beam[0,0] + dist*np.cos(theta+np.pi*2/3)/np.cos(np.radians(beam[6,1]))
     beam[7,1]  = beam[0,1] + dist*np.sin(theta+np.pi*1/3)
-    beam[7,0]  = beam[0,0] + dist*np.cos(theta+np.pi*1/3)/np.cos(np.radians(beam[2,1]))
+    beam[7,0]  = beam[0,0] + dist*np.cos(theta+np.pi*1/3)/np.cos(np.radians(beam[7,1]))
 
     beam[8,1]  = beam[0,1] + 2*dist*np.sin(theta+np.pi*0/3)
-    beam[8,0]  = beam[0,0] + 2*dist*np.cos(theta+np.pi*0/3)/np.cos(np.radians(beam[2,1]))
+    beam[8,0]  = beam[0,0] + 2*dist*np.cos(theta+np.pi*0/3)/np.cos(np.radians(beam[8,1]))
     beam[10,1] = beam[0,1] + 2*dist*np.sin(theta+np.pi*5/3)
-    beam[10,0] = beam[0,0] + 2*dist*np.cos(theta+np.pi*5/3)/np.cos(np.radians(beam[2,1]))
+    beam[10,0] = beam[0,0] + 2*dist*np.cos(theta+np.pi*5/3)/np.cos(np.radians(beam[10,1]))
     beam[12,1] = beam[0,1] + 2*dist*np.sin(theta+np.pi*4/3)
-    beam[12,0] = beam[0,0] + 2*dist*np.cos(theta+np.pi*4/3)/np.cos(np.radians(beam[2,1]))
+    beam[12,0] = beam[0,0] + 2*dist*np.cos(theta+np.pi*4/3)/np.cos(np.radians(beam[12,1]))
     beam[14,1] = beam[0,1] + 2*dist*np.sin(theta+np.pi*3/3)
-    beam[14,0] = beam[0,0] + 2*dist*np.cos(theta+np.pi*3/3)/np.cos(np.radians(beam[2,1]))
+    beam[14,0] = beam[0,0] + 2*dist*np.cos(theta+np.pi*3/3)/np.cos(np.radians(beam[14,1]))
     beam[16,1] = beam[0,1] + 2*dist*np.sin(theta+np.pi*2/3)
-    beam[16,0] = beam[0,0] + 2*dist*np.cos(theta+np.pi*2/3)/np.cos(np.radians(beam[2,1]))
+    beam[16,0] = beam[0,0] + 2*dist*np.cos(theta+np.pi*2/3)/np.cos(np.radians(beam[16,1]))
     beam[18,1] = beam[0,1] + 2*dist*np.sin(theta+np.pi*1/3)
-    beam[18,0] = beam[0,0] + 2*dist*np.cos(theta+np.pi*1/3)/np.cos(np.radians(beam[2,1]))
+    beam[18,0] = beam[0,0] + 2*dist*np.cos(theta+np.pi*1/3)/np.cos(np.radians(beam[18,1]))
 
     beam[9,1]  = beam[0,1] + 2*np.cos(np.pi*1/6)*dist*np.sin(theta+np.pi*11/6)
-    beam[9,0]  = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*11/6)/np.cos(np.radians(beam[2,1]))
+    beam[9,0]  = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*11/6)/np.cos(np.radians(beam[9,1]))
     beam[11,1] = beam[0,1] + 2*np.cos(np.pi*1/6)*dist*np.sin(theta+np.pi*9/6)
-    beam[11,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*9/6)/np.cos(np.radians(beam[2,1]))
+    beam[11,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*9/6)/np.cos(np.radians(beam[11,1]))
     beam[13,1] = beam[0,1] + 2*np.cos(np.pi*1/6)*dist*np.sin(theta+np.pi*7/6)
-    beam[13,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*7/6)/np.cos(np.radians(beam[2,1]))
+    beam[13,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*7/6)/np.cos(np.radians(beam[13,1]))
     beam[15,1] = beam[0,1] + 2*np.cos(np.pi*1/6)*dist*np.sin(theta+np.pi*5/6)
-    beam[15,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*5/6)/np.cos(np.radians(beam[2,1]))
+    beam[15,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*5/6)/np.cos(np.radians(beam[15,1]))
     beam[17,1] = beam[0,1] + 2*np.cos(np.pi*1/6)*dist*np.sin(theta+np.pi*3/6)
-    beam[17,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*3/6)/np.cos(np.radians(beam[2,1]))
+    beam[17,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*3/6)/np.cos(np.radians(beam[17,1]))
     beam[19,1] = beam[0,1] + 2*np.cos(np.pi*1/6)*dist*np.sin(theta+np.pi*1/6)
-    beam[19,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*1/6)/np.cos(np.radians(beam[2,1]))
+    beam[19,0] = beam[0,0] + 2*np.cos(np.pi*1/6)*dist*np.cos(theta+np.pi*1/6)/np.cos(np.radians(beam[19,1]))
 
     return beam
 

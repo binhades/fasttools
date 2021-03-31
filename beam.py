@@ -205,8 +205,16 @@ def antenna_gain(beam=1, ZA=0, frequency=1400.): # K/Jy
 
 def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5365,id=None):
     # copied from .coor/coor_table.py
-
     #beam seperate unit in arcmin. 270mm distance to anglar distance
+    #-------------------------
+    # add 20210331
+    # As far as I know, the horn-dist is 270mm and the fod is 0.4621.
+    # This give the beam distance of 6.695 arcmin, not matching with Jiang2020.
+    # According to Jiang2020, we set beam dist to 5.76, from (270mm && 0.5356fod)
+    # But now I see the updated value of dist = 5.74 from the FAST offical train workshop (20191113)
+    # this need: (270mm && 0.5390fod) or (231.47mm && 0.4621fod)
+    #-------------------------
+
     dist = np.degrees(np.arctan(0.270/(300*fod))) # f/d=0.4611, but scaled to match the measured beam seperation, then need 0.5365
     theta = np.deg2rad(theta)
 

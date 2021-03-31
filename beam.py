@@ -208,6 +208,7 @@ def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5365,id=None):
 
     #beam seperate unit in arcmin. 270mm distance to anglar distance
     dist = np.degrees(np.arctan(0.270/(300*fod))) # f/d=0.4611, but scaled to match the measured beam seperation, then need 0.5365
+    theta = np.deg2rad(theta)
 
     beam = np.zeros((20,2))
     beam[0,0]  = beam_cx

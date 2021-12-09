@@ -1,18 +1,14 @@
-#! /home/bliu/anaconda3/bin/python
+#! /usr/bin/python3
 # Filename: coor_conv.py
 # Aim: to convert the XYZ to RaDec
-
-#import sys,os,glob,datetime,csv
-#from astropy.coordinates import *
-#import numpy as np
 
 from astropy.coordinates import SkyCoord, AltAz
 from astropy import units as u
 from astropy.time import Time
 from ..location import get_fast_location
 
-## to replace the default url to : http://maia.usno.navy.mil/ser7/finals2000A.all
 from astropy.utils import iers 
+# to replace the default url to : http://maia.usno.navy.mil/ser7/finals2000A.all
 iers.conf.iers_auto_url =  'http://jlrat.bao.ac.cn/~bliu/doc/finals2000A.all'
     
 def xyz2azel(x,y,z):

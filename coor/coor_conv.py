@@ -62,7 +62,7 @@ def azel2radec(az,el,mjd):
     coor_azel = SkyCoord(az=az*u.degree, alt=el*u.degree, obstime=obstime,\
                          relative_humidity=relative_humidity, pressure=pressure,\
                          temperature=temperature, obswl=obswl, location=fast_loc, frame='altaz')
-    coor_icrs = coor_azel.transform_to(ICRS) 
+    coor_icrs = coor_azel.transform_to('icrs') 
     ra = coor_icrs.ra.degree
     dec= coor_icrs.dec.degree
 

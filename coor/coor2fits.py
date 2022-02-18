@@ -43,8 +43,8 @@ def radec2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
     tab_ra = tab[1,:]
     tab_dec = tab[2,:]
    
-    obs_utc = hdul[1].data['DATE-OBS']
-    obs_mjd = utc2mjd(obs_utc) 
+    obs_utc = hdul[1].data['DATE-OBS'] + 0.5*hdul[1].data['EXPOSURE'][0]
+    obs_mjd = utc2mjd(obs_utc)
 
     for i in range(len(obs_mjd)):
         ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()

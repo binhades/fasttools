@@ -17,7 +17,10 @@ def getcal(calon,caloff,leng):
 
     return calstat
 
-def cal2fits(hdul,calon=1,caloff=1,caltype='high'):
+def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='high'):
+
+    calon  = round(calon/expose)
+    caloff = round(caloff/expose)
 
     if (not ('CALTYPE' in hdul[1].header)):
         hdul[1].header.append(('CALTYPE',caltype))

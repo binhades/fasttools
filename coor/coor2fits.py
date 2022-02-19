@@ -45,8 +45,8 @@ def radec2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
    
     # hdul[1].data['EXPOSURE'][0] only stored in the raw and combined fits.
     # sdfits of calibrated fullband and cutrrls has this in Hdr.
-    obs_utc = hdul[1].data['DATE-OBS'] + 0.5*hdul[1].data['EXPOSURE'][0]
-    obs_mjd = utc2mjd(obs_utc)
+    obs_utc = hdul[1].data['DATE-OBS']
+    obs_mjd = utc2mjd(obs_utc) + 0.5*hdul[1].data['EXPOSURE'][0]/(24.0*3600.0)
 
     for i in range(len(obs_mjd)):
         ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
@@ -66,8 +66,8 @@ def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
    
     # hdul[1].data['EXPOSURE'][0] only stored in the raw and combined fits.
     # sdfits of calibrated fullband and cutrrls has this in Hdr.
-    obs_utc = hdul[1].data['DATE-OBS'] + 0.5*hdul[1].data['EXPOSURE'][0]
-    obs_mjd = utc2mjd(obs_utc) 
+    obs_utc = hdul[1].data['DATE-OBS']
+    obs_mjd = utc2mjd(obs_utc) + 0.5*hdul[1].data['EXPOSURE'][0]/(24.0*3600.0)
 
     obs_az = []
     obs_el = []

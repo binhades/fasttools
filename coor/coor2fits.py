@@ -62,7 +62,7 @@ def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
     tab_az = tab[3,:]
     tab_el = tab[4,:]
    
-    obs_utc = hdul[1].data['DATE-OBS']
+    obs_utc = hdul[1].data['DATE-OBS'] + 0.5*hdul[1].data['EXPOSURE'][0]
     obs_mjd = utc2mjd(obs_utc) 
 
     obs_az = []

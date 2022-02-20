@@ -36,7 +36,7 @@ def utc2mjd(obs_utc):
 
     return t.mjd
 
-def radec2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
+def radec2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=',',update=True):
 
     tab = csv_load(file_coor,delimiter=delimiter,beam=beam)
     tab_mjd = tab[0,:]
@@ -53,11 +53,12 @@ def radec2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
         hdul[1].data['OBJ_RA'][i] = tab_ra[ind]
         hdul[1].data['OBJ_DEC'][i] = tab_dec[ind]
 
-    hdul.flush()
+    if update:
+        hdul.flush()
 
-    return 0
+    return hdul[1].data['OBJ_RA'],hdul[1].data['OBJ_DEC']
 
-def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
+def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=',',update=True):
     
     tab = csv_load(file_coor,delimiter=delimiter,beam=beam)
     tab_mjd = tab[0,:]
@@ -87,7 +88,9 @@ def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=','):
         newhdu = fits.BinTableHDU.from_columns(newcols)
         hdul[1].data = newhdu.data
 
-    hdul.flush()
+    if update:
+        hdul.flush()
 
-    return 0
+    return obs_az,obs_el
+
 

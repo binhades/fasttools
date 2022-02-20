@@ -17,15 +17,17 @@ def getcal(calon,caloff,leng):
 
     return calstat
 
-def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='high'):
+def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='low',update=True):
 
     calon  = round(calon/expose)
     caloff = round(caloff/expose)
 
-    if (not ('CALTYPE' in hdul[1].header)):
-        hdul[1].header.append(('CALTYPE',caltype))
-    else:
-        hdul[1].header['CALTYPE'] = caltype
+    
+    hdul[1].header.set('CALTYPE',caltype,'Tcal type, low or high',before='EXTVER')
+#    if (not ('CALTYPE' in hdul[1].header)):
+#        hdul[1].header.append(('CALTYPE',caltype))
+#    else:
+#        hdul[1].header['CALTYPE'] = caltype
 
     leng = hdul[1].header['NAXIS2']
     calstat = getcal(calon,caloff,leng)
@@ -40,6 +42,7 @@ def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='high'):
         newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
         hdul[1].data = newhdu.data
 
-    hdul.flush()
-    return 1
+    if update:
+        hdul.flush()
+    return fits.Column(name='CALSTAT',format='1L',array=calstat)
 

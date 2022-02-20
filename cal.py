@@ -44,5 +44,5 @@ def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='low',update=True):
 
     if update:
         hdul.flush()
-    return fits.Column(name='CALSTAT',format='1L',array=calstat)
+    return calstat
 

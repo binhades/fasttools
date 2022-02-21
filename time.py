@@ -2,7 +2,6 @@
 # Filename: time.py
 # Aim: to convert utc to mjd or lst at location of the FAST site
 
-
 def fast_time(obs_utc,scale='utc',format='isot'):
     from astropy.time import Time
     from .location import get_fast_location
@@ -25,12 +24,12 @@ def utc2lst(obs_utc,scale='utc',format='isot'):
 
     return lst
 
-def mjd2fits(hdul):
+def mjd2fits(hdul,update=True):
 
     from astropy.io import fits
 
     obs_utc = hdul[1].data['DATE-OBS']
-    obs_mjd = utc2mjd(obs_utc)
+    obs_mjd = utc2mjd(obs_utc) + 0.5*hdul[1].data['EXPOSURE'][0]/(24.0*3600.0)
 
     if 'MJD' in hdul[1].columns.names:
         hdul[1].data['MJD'] = obs_mjd
@@ -39,6 +38,7 @@ def mjd2fits(hdul):
         newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
         hdul[1].data = newhdu.data
 
-    hdul.flush()
-    return 1
+    if update:
+        hdul.flush()
+    return obs_mjd
         

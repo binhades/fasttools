@@ -23,26 +23,21 @@ def cal2fits(hdul,calon=1,caloff=1,expose=1,caltype='low',update=True):
     caloff = round(caloff/expose)
 
     
-    hdul[1].header.set('CALTYPE',caltype,'Tcal type, low or high',before='EXTVER')
-#    if (not ('CALTYPE' in hdul[1].header)):
-#        hdul[1].header.append(('CALTYPE',caltype))
-#    else:
-#        hdul[1].header['CALTYPE'] = caltype
 
     leng = hdul[1].header['NAXIS2']
     calstat = getcal(calon,caloff,leng)
 
-    if 'CALSTAT' in hdul[1].columns.names:
-
-        hdul[1].data['CALSTAT'] = calstat
-
-    else:
-
-        new_col = fits.Column(name='CALSTAT',format='1L',array=calstat)
-        newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
-        hdul[1].data = newhdu.data
-
     if update:
+        hdul[1].header.set('CALTYPE',caltype,'Tcal type, low or high',before='EXTVER')
+        if 'CALSTAT' in hdul[1].columns.names:
+            hdul[1].data['CALSTAT'] = calstat
+
+        else:
+
+            new_col = fits.Column(name='CALSTAT',format='1L',array=calstat)
+            newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
+            hdul[1].data = newhdu.data
+
         hdul.flush()
     return calstat
 

@@ -16,10 +16,6 @@ def get_beam_from_filename(fname,type='raw'):
 def beam2fits(hdul,beam=1):
 
     hdul[1].header.set('BEAMID',beam,'Beam number of FAST 19-beams',before='EXTVER')
-#    if (not ('BEAMID' in hdul[1].header)):
-#        hdul[1].header.append(('BEAMID',beam))
-#    else:
-#        hdul[1].header['BEAMID'] = beam
     hdul.flush()
     return 1
 

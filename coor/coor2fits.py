@@ -48,15 +48,27 @@ def radec2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=',',update=True)
     obs_utc = hdul[1].data['DATE-OBS']
     obs_mjd = utc2mjd(obs_utc) + 0.5*hdul[1].data['EXPOSURE'][0]/(24.0*3600.0)
 
+    obs_ra = []
+    obs_dec= []
+
     for i in range(len(obs_mjd)):
         ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
-        hdul[1].data['OBJ_RA'][i] = tab_ra[ind]
-        hdul[1].data['OBJ_DEC'][i] = tab_dec[ind]
+        obs_ra.append(tab_ra[ind])
+        obs_dec.append(tab_dec[ind])
 
     if update:
+        if 'RA' in hdul[1].columns.names:
+            hdul[1].data['RA'] = obs_ra
+            hdul[1].data['DEC'] = obs_dec
+        else:
+            col_ra = fits.Column(name='RA',format='1D',array=obs_ra)
+            col_dec = fits.Column(name='DEC',format='1D',array=obs_dec)
+            newcols = hdul[1].columns + fits.ColDefs([col_ra,col_dec])
+            newhdu = fits.BinTableHDU.from_columns(newcols)
+            hdul[1].data = newhdu.data
         hdul.flush()
 
-    return hdul[1].data['OBJ_RA'],hdul[1].data['OBJ_DEC']
+    return obs_ra, obs_dec
 
 def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=',',update=True):
     
@@ -78,17 +90,16 @@ def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=',',update=True):
         obs_az.append(tab_az[ind])
         obs_el.append(tab_el[ind])
 
-    if 'AZ' in hdul[1].columns.names:
-        hdul[1].data['AZ'] = obs_az
-        hdul[1].data['EL'] = obs_el
-    else:
-        col_az = fits.Column(name='AZ',format='1D',array=obs_az)
-        col_el = fits.Column(name='EL',format='1D',array=obs_el)
-        newcols = hdul[1].columns + fits.ColDefs([col_az,col_el])
-        newhdu = fits.BinTableHDU.from_columns(newcols)
-        hdul[1].data = newhdu.data
-
     if update:
+        if 'AZ' in hdul[1].columns.names:
+            hdul[1].data['AZ'] = obs_az
+            hdul[1].data['EL'] = obs_el
+        else:
+            col_az = fits.Column(name='AZ',format='1D',array=obs_az)
+            col_el = fits.Column(name='EL',format='1D',array=obs_el)
+            newcols = hdul[1].columns + fits.ColDefs([col_az,col_el])
+            newhdu = fits.BinTableHDU.from_columns(newcols)
+            hdul[1].data = newhdu.data
         hdul.flush()
 
     return obs_az,obs_el

@@ -29,14 +29,14 @@ def vframe2fits(hdul, ra, dec, mjd, update=True):
 
     vframe = getVframeLSR(ra,dec,mjd)
 
-    if 'VFRAME' in hdul[1].columns.names:
-        hdul[1].data['VFRAME'] = vframe
-    else:
-        new_col = fits.Column(name='VFRAME',format='1D',array=vframe)
-        newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
-        hdul[1].data = newhdu.data
-
     if update:
+        if 'VFRAME' in hdul[1].columns.names:
+            hdul[1].data['VFRAME'] = vframe
+        else:
+            new_col = fits.Column(name='VFRAME',format='1D',array=vframe)
+            newhdu = fits.BinTableHDU.from_columns(hdul[1].columns + fits.ColDefs([new_col]))
+            hdul[1].data = newhdu.data
+
         hdul.flush()
 
     return vframe

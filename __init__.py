@@ -9,6 +9,7 @@ from . import cut
 from . import beam
 from . import location
 from . import time
+from . import velo
 #---------------------------
 # from folder
 

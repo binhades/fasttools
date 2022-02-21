@@ -7,9 +7,9 @@ from astropy import units as u
 from astropy.time import Time
 from ..location import get_fast_location
 
-from astropy.utils import iers 
+#from astropy.utils import iers 
 # to replace the default url to : http://maia.usno.navy.mil/ser7/finals2000A.all
-iers.conf.iers_auto_url =  'http://jlrat.bao.ac.cn/~bliu/doc/finals2000A.all'
+#iers.conf.iers_auto_url =  'http://jlrat.bao.ac.cn/~bliu/doc/finals2000A.all'
     
 def xyz2azel(x,y,z):
     import numpy as np

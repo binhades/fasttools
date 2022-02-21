@@ -9,6 +9,7 @@ from astropy.io import fits
 #from astropy.coordinates import *
 from astropy.coordinates import SkyCoord
 from .location import get_fast_location
+
 # Schonrich et al.(2010) Barycentric velocity relative to the LSR, which is defined in
 # Galactic (right-handed) cartesian velocity components (U,V,W) = (11.1,12.24,7.25) km/s
 

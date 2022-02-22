@@ -19,14 +19,15 @@ def beam2fits(hdul,beam=1):
     hdul.flush()
     return 1
 
+def unit2sdfits(hdul,unit='K',comment=None):
+    ind = hdul[1].columns.names.index('DATA')
+    hdul[1].header.set(f'TUNIT{ind+1}', unit, comment)
+    hdul.flush()
+
 def unit2fits(hdul,unit='K',comment=None):
-    if (not ('CUNIT2' in hdul[1].header)):
-        hdul[1].header.append(('CUNIT2',unit,comment))
-    else:
-        hdul[1].header['CUNIT2'] = (unit,comment)
+    hdul[1].header.set('CUNIT2', unit, comment)
     hdul.flush()
     return 1
-
 
 def beam_size(beam=1,frequency=1400.,plot=False):
 
@@ -195,10 +196,14 @@ def main_beam_eff(beam=1, ZA=0, frequency=1400.): # apply the frequency at 1400
 
     return mb_eff
 
-def antenna_gain(beam=1, ZA=0, frequency=1400.): # K/Jy
-    gain0=25.6
-    ape_eff = aperture_eff(beam=beam,ZA=ZA,frequency=frequency)
+def FAST_Gain0(): # K/Jy
+    #gain0 = 1e-26/(2*1.38e-23) * np.pi*(150.0**2) 
+    gain0 = 25.61
+    return 25.61
 
+def antenna_gain(beam=1, ZA=0, frequency=1400.): # K/Jy
+    gain0 = FAST_Gain0()
+    ape_eff = aperture_eff(beam=beam,ZA=ZA,frequency=frequency)
     return ape_eff*gain0
 
 def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5365,id=None):

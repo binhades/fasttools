@@ -1,8 +1,9 @@
-#! /usr/bin/python3
 # Filename: coor_conv.py
 # Aim: to convert the XYZ to RaDec
 
-from astropy.coordinates import SkyCoord, AltAz
+# Frame: HADec needs Astropy version 5.0+
+
+from astropy.coordinates import SkyCoord, AltAz #, HADec
 from astropy import units as u
 from astropy.time import Time
 from ..location import get_fast_location
@@ -75,16 +76,45 @@ def coor_conv(mjd,x,y,z):
 
     return ra,dec,az,el
 
-#----------------------------------
-if __name__ == '__main__':
-    import sys
-    if len(sys.argv)<4:
-
-        print('input x,y,z')
-
-    else:
-
-        x = float(sys.argv[1])
-        y = float(sys.argv[2])
-        z = float(sys.argv[3])
-        coor_conv(x,y,z)
+# ---------------------------------
+# Frame: HADec needs Astropy version 5.0+
+#def radec2hadec(ra,dec,mjd):
+#
+#    fast_loc = get_fast_location()
+#
+#    obswl = 21 * u.cm
+#    temperature = 25 * u.deg_C
+#    relative_humidity = 0.5
+#    pressure = 90000 * u.Pa
+#    obstime = Time(mjd,format='mjd')
+#
+#    coor_icrs = SkyCoord(ra=ra*u.degree,dec=dec*u.degree,frame='icrs')
+#    coor_hadec = coor_icrs.transform_to(HADec(obstime=obstime, obswl=obswl,\
+#                         relative_humidity=relative_humidity, pressure=pressure,\
+#                         temperature=temperature, location=fast_loc)) 
+#    ha  = coor_hadec.ha.degree
+#    dec = coor_hadec.dec.degree
+#
+#    return ha, dec
+#
+#def azel2hadec(az,el,mjd):
+#
+#    fast_loc = get_fast_location()
+#
+#    obswl = 21 * u.cm
+#    temperature = 25 * u.deg_C
+#    relative_humidity = 0.5
+#    pressure = 90000 * u.Pa
+#    obstime = Time(mjd,format='mjd')
+#    
+#    coor_azel = SkyCoord(az=az*u.degree, alt=el*u.degree, obstime=obstime,\
+#                         relative_humidity=relative_humidity, pressure=pressure,\
+#                         temperature=temperature, obswl=obswl, location=fast_loc, frame='altaz')
+#    coor_hadec = coor_azel.transform_to(HADec(obstime=obstime, obswl=obswl,\
+#                         relative_humidity=relative_humidity, pressure=pressure,\
+#                         temperature=temperature, location=fast_loc)) 
+#    ha = coor_hadec.ha.degree
+#    dec= coor_hadec.dec.degree
+#
+#    return ha,dec
+# ---------------------------------

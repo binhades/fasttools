@@ -7,6 +7,7 @@ import numpy as np
 import datetime 
 from astropy.time import Time
 from .coor_conv import *
+from ..obslog import rotlog
 
 def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5365):
 
@@ -168,34 +169,29 @@ def multi_beam_offset(ra_c,dec_c,mjd,rot):
 
     return coor_dict
 
-def coor_table(file_xyz,fileout='coor_table.csv', delimiter=',', rot0=None, cb=False, nowt=False):
+def coor_table(file_xyz,fileout='coor_table.csv', delimiter=',', rot_log=None, rot0=0.0, cb=False, nowt=False):
     # we need set rot0 for RA and DE scans respectively.
     # also need to get the delta_rot = (mesure - theory) from csv_load, to exclude feild rotation of the receiver.
 
+    if rot_log is not None:
+        rot0 = rotlog(rot_log,file_xyz)
     if rot0 is None:
-        delta=False
-    else:
-        delta=True
+        rot0 = 0.0
 
-    data = csv_load(file_xyz,delimiter=delimiter,delta=delta)
+    data = csv_load(file_xyz,delimiter=delimiter,delta=True)
+
     mjd = data[0,:]
     x   = data[1,:]
     y   = data[2,:]
     z   = data[3,:]
-
     ra_c,dec_c,az_c,el_c = coor_conv(mjd,x,y,z)
-
-    if rot0 is None:
-        rot = data[4,:] # rot_measure
-    else:
-        rot = rot0*np.pi/180 + data[4,:] # delta = (measure - theory)
+    rot = rot0*np.pi/180 + data[4,:] # delta = (measure - theory)
 
     if not cb:
         coor_dict = multi_beam_offset(ra_c,dec_c,mjd, rot)
         coor = coor_dict
         if not nowt:
             csv_write(coor_dict,fileout)
-
     else:
         coor = [mjd, ra_c, dec_c, az_c, el_c]
 
@@ -204,15 +200,10 @@ def coor_table(file_xyz,fileout='coor_table.csv', delimiter=',', rot0=None, cb=F
 def field_rotation(az, dec, el=None, mjd=None):
 
     fast_lat = 25.6534387
+    rot = np.arcsin(np.sin(az*np.pi/180)/np.cos(dec*np.pi/180)*np.cos(fast_lat*np.pi/180))
     #----------------------------------------------------
     #ha, dec = azel2hadec(az,el,mjd) # not yet working
     #rot = np.arcsin(np.sin(ha*np.pi/180)/np.cos(el*np.pi/180)*np.cos(fast_lat*np.pi/180))
     #----------------------------------------------------
-    rot = np.arcsin(np.sin(az*np.pi/180)/np.cos(dec*np.pi/180)*np.cos(fast_lat*np.pi/180))
-
-    #b = (90 - el) * np.pi/180
-    #c = (90 - fast_lat) * np.pi/180
-    #x = np.sin(az * np.pi/180) * np.tan(b)/(np.sin(c) - np.cos(c)*np.cos(az)*np.tan(b))
-    #y = np.arctan(x) # in rad
     return rot
 

@@ -60,13 +60,14 @@ def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5365):
 
     return beam
 
-def csv_load(file_xyz,delimiter=','):
+def csv_load(file_xyz,delimiter=',', delta=True):
 
     mjd=[]
     x=[]
     y=[]
     z=[]
-    rot=[]
+    rot_SDP=[] # measure
+    delta_rot = [] # measure - theory
 
     with open(file_xyz,'rt') as filein:
 
@@ -76,11 +77,16 @@ def csv_load(file_xyz,delimiter=','):
             x.append(float(row['SDP_PhaPos_X']))
             y.append(float(row['SDP_PhaPos_Y']))
             z.append(float(row['SDP_PhaPos_Z']))
-            rot.append(float(row['SDP_AngleM']))
+            rot_SDP.append(float(row['SDP_AngleM']))
+            delta_rot.append(float(row['SDP_AngleM']) - float(row['TRP_AngleM']))
             ctime = row['SysTime']
             mjd.append(ctime2mjd(ctime))
 
-    return np.array([mjd,x,y,z,rot])
+    if delta:
+        return np.array([mjd,x,y,z,delta_rot])
+    else:
+        return np.array([mjd,x,y,z,rot_SDP])
+
 
 def csv_write(rows,fileout,delimiter=','):
 
@@ -162,16 +168,27 @@ def multi_beam_offset(ra_c,dec_c,mjd,rot):
 
     return coor_dict
 
-def coor_table(file_xyz,fileout='coor_table.csv',delimiter=',',cb=False,nowt=False):
+def coor_table(file_xyz,fileout='coor_table.csv', delimiter=',', rot0=None, cb=False, nowt=False):
+    # we need set rot0 for RA and DE scans respectively.
+    # also need to get the delta_rot = (mesure - theory) from csv_load, to exclude feild rotation of the receiver.
 
-    data = csv_load(file_xyz,delimiter=delimiter)
+    if rot0 is None:
+        delta=False
+    else:
+        delta=True
+
+    data = csv_load(file_xyz,delimiter=delimiter,delta=delta)
     mjd = data[0,:]
     x   = data[1,:]
     y   = data[2,:]
     z   = data[3,:]
-    rot = data[4,:]
 
     ra_c,dec_c,az_c,el_c = coor_conv(mjd,x,y,z)
+
+    if rot0 is None:
+        rot = data[4,:] # rot_measure
+    else:
+        rot = rot0*np.pi/180 + data[4,:] # delta = (measure - theory)
 
     if not cb:
         coor_dict = multi_beam_offset(ra_c,dec_c,mjd, rot)
@@ -180,7 +197,22 @@ def coor_table(file_xyz,fileout='coor_table.csv',delimiter=',',cb=False,nowt=Fal
             csv_write(coor_dict,fileout)
 
     else:
-        coor = [ra_c,dec_c,az_c,el_c]
+        coor = [mjd, ra_c, dec_c, az_c, el_c]
 
     return coor
+
+def field_rotation(az, dec, el=None, mjd=None):
+
+    fast_lat = 25.6534387
+    #----------------------------------------------------
+    #ha, dec = azel2hadec(az,el,mjd) # not yet working
+    #rot = np.arcsin(np.sin(ha*np.pi/180)/np.cos(el*np.pi/180)*np.cos(fast_lat*np.pi/180))
+    #----------------------------------------------------
+    rot = np.arcsin(np.sin(az*np.pi/180)/np.cos(dec*np.pi/180)*np.cos(fast_lat*np.pi/180))
+
+    #b = (90 - el) * np.pi/180
+    #c = (90 - fast_lat) * np.pi/180
+    #x = np.sin(az * np.pi/180) * np.tan(b)/(np.sin(c) - np.cos(c)*np.cos(az)*np.tan(b))
+    #y = np.arctan(x) # in rad
+    return rot
 

@@ -104,4 +104,82 @@ def azel2fits(hdul,beam=1,file_coor='coor_table.csv',delimiter=',',update=True):
 
     return obs_az,obs_el
 
+def radec2sdfits(hdul,file_coor='coor_table.csv',delimiter=',',update=True):
 
+    beam = hdul[1].header['BEAMID']
+    tab = csv_load(file_coor,delimiter=delimiter,beam=beam)
+    tab_mjd = tab[0,:]
+    tab_ra = tab[1,:]
+    tab_dec = tab[2,:]
+   
+    obs_mjd = hdul[1].data['MJD']
+    obs_ra = []
+    obs_dec= []
+
+    for i in range(len(obs_mjd)):
+        ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
+        obs_ra.append(tab_ra[ind])
+        obs_dec.append(tab_dec[ind])
+
+    if update:
+        hdul[1].data['RA'] = obs_ra
+        hdul[1].data['DEC'] = obs_dec
+        hdul.flush()
+
+    return obs_ra, obs_dec
+
+def azel2sdfits(hdul,file_coor='coor_table.csv',delimiter=',',update=True):
+     
+    beam = hdul[1].header['BEAMID']
+    tab = csv_load(file_coor,delimiter=delimiter,beam=beam)
+    tab_mjd = tab[0,:]
+    tab_az = tab[3,:]
+    tab_el = tab[4,:]
+   
+    obs_mjd = hdul[1].data['MJD']
+    obs_az = []
+    obs_el = []
+
+    for i in range(len(obs_mjd)):
+        ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
+        obs_az.append(tab_az[ind])
+        obs_el.append(tab_el[ind])
+
+    if update:
+        hdul[1].data['AZ'] = obs_az
+        hdul[1].data['EL'] = obs_el
+        hdul.flush()
+
+    return obs_az,obs_el
+
+def coor2sdfits(hdul,file_coor='coor_table.csv',delimiter=',',update=True):
+    
+    beam = hdul[1].header['BEAMID']
+    tab = csv_load(file_coor,delimiter=delimiter,beam=beam)
+    tab_mjd = tab[0,:]
+    tab_ra = tab[1,:]
+    tab_dec = tab[2,:]
+    tab_az = tab[3,:]
+    tab_el = tab[4,:]
+   
+    obs_mjd = hdul[1].data['MJD']
+    obs_ra = []
+    obs_dec= []
+    obs_az = []
+    obs_el = []
+
+    for i in range(len(obs_mjd)):
+        ind = (np.abs(tab_mjd-obs_mjd[i])).argmin()
+        obs_ra.append(tab_ra[ind])
+        obs_dec.append(tab_dec[ind])
+        obs_az.append(tab_az[ind])
+        obs_el.append(tab_el[ind])
+
+    if update:
+        hdul[1].data['RA'] = obs_ra
+        hdul[1].data['DEC'] = obs_dec
+        hdul[1].data['AZ'] = obs_az
+        hdul[1].data['EL'] = obs_el
+        hdul.flush()
+
+    return obs_ra, obs_dec, obs_az,obs_el

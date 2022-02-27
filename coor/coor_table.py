@@ -169,6 +169,28 @@ def multi_beam_offset(ra_c,dec_c,mjd,rot):
 
     return coor_dict
 
+
+def multi_beam_offset2(ra_c,dec_c,mjd,rot):
+    # beam_coors returns the beam offset in the epoch of observing DATE, not J2000.
+    # so we should transfer the ra_c, dec_c to observing epoch before get beam coords.
+    # the error is about 0.5 ~ 5 arcsec << 1/20 beam
+
+    beam = np.zeros((20,2,len(ra_c)))
+
+    ra_c_obs, dec_c_obs = epoch_J2000_to_obs(ra_c, dec_c, mjd)
+    for i in range(len(ra_c)):
+        beam[:,:,i] = beam_coors(beam_cx=ra_c_obs[i],beam_cy=dec_c_obs[i],theta=rot[i])
+
+    ra_obs = beam[:,0,:]
+    dec_obs = beam[:,1,:]
+
+    ra, dec = epoch_obs_to_J2000(ra_obs,dec_obs,mjd)
+    az,el = radec2azel(ra,dec,mjd)
+    
+    coor_dict = data2dict(mjd,ra,dec,az,el)
+
+    return coor_dict
+
 def coor_table(file_xyz,fileout='coor_table.csv', delimiter=',', rot_log=None, rot0=0.0, cb=False, nowt=False):
     # we need set rot0 for RA and DE scans respectively.
     # also need to get the delta_rot = (mesure - theory) from csv_load, to exclude feild rotation of the receiver.

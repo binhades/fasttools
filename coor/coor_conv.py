@@ -76,6 +76,28 @@ def coor_conv(mjd,x,y,z):
 
     return ra,dec,az,el
 
+def epoch_J2000_to_obs(ra,dec,mjd):
+
+    obstime = Time(mjd,format='mjd')
+    coor_icrs = SkyCoord(ra=ra*u.degree,dec=dec*u.degree,frame='icrs')
+    coor_obs = coor_icrs.transform_to(FK5(equinox=obstime))
+    ra_obs = coor_obs.ra.degree
+    dec_obs= coor_obs.dec.degree
+
+    return ra_obs,dec_obs
+
+def epoch_obs_to_J2000(ra,dec,mjd):
+
+    obstime = Time(mjd,format='mjd')
+    coor_obs = SkyCoord(ra=ra*u.degree,dec=dec*u.degree,frame=FK5, equinox=obstime)
+    coor_icrs = coor_obs.transform_to('icrs')
+    ra_J2000 = coor_icrs.ra.degree
+    dec_J2000= coor_icrs.dec.degree
+
+    return ra_J2000,dec_J2000
+
+
+
 # ---------------------------------
 # Frame: HADec needs Astropy version 5.0+
 #def radec2hadec(ra,dec,mjd):

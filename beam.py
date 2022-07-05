@@ -217,6 +217,11 @@ def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5365,id=None):
     # But now I see the updated value of dist = 5.74 from the FAST offical train workshop (20191113)
     # this need: (270mm && 0.5390fod) or (231.47mm && 0.4621fod)
     #-------------------------
+    # add 20220705
+    # If the RA axis is to the left (9876543210), theta should be positve for clockwise rotation.
+    # If the RA axis is to the right (012345678), theta should be positve for counterclockwise rotation.
+    # I have checked the following code is corrected for this sake.
+    #-------------------------
 
     dist = np.degrees(np.arctan(0.270/(300*fod))) # f/d=0.4611, but scaled to match the measured beam seperation, then need 0.5365
     theta = np.deg2rad(theta)

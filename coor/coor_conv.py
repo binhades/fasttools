@@ -8,6 +8,7 @@ from astropy import units as u
 from astropy.time import Time
 from ..location import get_fast_location
 import numpy as np
+import math
 
 #from astropy.utils import iers 
 # to replace the default url to : http://maia.usno.navy.mil/ser7/finals2000A.all
@@ -145,9 +146,9 @@ def coor_conv_multibeam(mjd,beam_id,x,y,z,Yaw,Pitch,Roll,multibeamAngle):
 
     beam_idx = np.arange(19)+1
 
-    az,el = xyz2azel_multibeam(beam_id,x,y,z, Yaw, Pitch, Roll, multibeamAngle)         # units in degrees
-    az = np.array(az, dtype='float64')
-    el = np.array(el, dtype='float64')
+    az,el = xyz2AzEl_MultiBeam(beam_id,x,y,z, Yaw, Pitch, Roll, multibeamAngle)         # units in degrees
+    az = np.array(az, dtype='float64') * 180/np.pi
+    el = np.array(el, dtype='float64') * 180/np.pi
 
     ra,dec = azel2radec(az,el,mjd)
 

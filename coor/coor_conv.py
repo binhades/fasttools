@@ -146,17 +146,15 @@ def coor_conv_multibeam(mjd,beam_id,x,y,z,Yaw,Pitch,Roll,multibeamAngle):
 
     beam_idx = np.arange(19)+1
 
-    az,el = xyz2AzEl_MultiBeam(beam_id,x,y,z, Yaw, Pitch, Roll, multibeamAngle)         # units in degrees
-    az = np.array(az, dtype='float64') * 180/np.pi
-    el = np.array(el, dtype='float64') * 180/np.pi
-
+    x,y,z = kypara2xyz_MultiBeam(beam_id,x,y,z, Yaw, Pitch, Roll, multibeamAngle)         # units in degrees
+    az,el = xyz2azel(x,y,z) # units in degrees
     ra,dec = azel2radec(az,el,mjd)
 
     return ra,dec,az,el
 
 # Following code: adapted from HiFAST, which adapted from FAST_ResultDataInversTool.exe 
     
-def kypara2AzEl(nB, globalCenterX, globalCenterY, globalCenterZ, globalYaw, globalPitch, globalRoll, multibeamAngle):
+def kypara2xyz(nB, globalCenterX, globalCenterY, globalCenterZ, globalYaw, globalPitch, globalRoll, multibeamAngle):
     """
     return Az: Azimuth in radian, El: Elevation
     """
@@ -193,15 +191,9 @@ def kypara2AzEl(nB, globalCenterX, globalCenterY, globalCenterZ, globalYaw, glob
     #4.计算全局坐标
     posAbsolute = posRelative + np.array([globalCenterX,  globalCenterY, globalCenterZ])
 
-    #5.计算地平坐标
-    #Az
-    Az = math.atan2(-posAbsolute[0], -posAbsolute[1])
-    #El
-    El = math.pi/2 - math.atan2(math.sqrt(posAbsolute[0]**2 + posAbsolute[1] **2), -posAbsolute[2])
-    
-    return Az, El
+    return posAbsolute[0],posAbsolute[1],posAbsolute[2]
 
-xyz2AzEl_MultiBeam = np.frompyfunc(kypara2AzEl, 8, 2)
+kypara2xyz_MultiBeam = np.frompyfunc(kypara2xyz, 8, 3)
 
 
 #other functions

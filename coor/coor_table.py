@@ -248,7 +248,7 @@ def coor_table_multibeam(file_xyz, fileout='coor_table.csv', delimiter=',', nowt
 
     for i in range(19):
         beam_id = i+1
-        ra[i,:], dec[i,:], az[i,:], el[i,:] = coor_conv_multibeam(mjd, beam_id, x, y, z, Yaw, Pitch, Roll, multibeamAngle)
+        ra[beam_id,:], dec[beam_id,:], az[beam_id,:], el[beam_id,:] = coor_conv_multibeam(mjd, beam_id, x, y, z, Yaw, Pitch, Roll, multibeamAngle)
 
     coor_dict = data2dict(mjd,ra,dec,az,el)
     if not nowt:

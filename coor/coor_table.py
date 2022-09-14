@@ -9,10 +9,10 @@ from astropy.time import Time
 from .coor_conv import *
 from ..obslog import rotlog
 
-def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5365):
+def beam_coors(beam_cx=0,beam_cy=0,theta=0,fod=0.5390185): # updated 20220914
 
     #beam seperate unit in degree. 270mm distance to anglar distance
-    dist = np.degrees(np.arctan(0.270/(300*fod))) # f/d=0.4611, but scaled to match the measured beam seperation, then need 0.5365
+    dist = np.degrees(np.arctan(0.270/(300*fod))) # f/d=0.4611, but scaled to match the measured beam seperation, then need 0.5390185
 
     beam = np.zeros((20,2))
     beam[0,0]  = beam_cx
@@ -240,9 +240,9 @@ def coor_table_multibeam(file_xyz, fileout='coor_table.csv', delimiter=',', nowt
     Pitch          = data[6,:]
     Roll           = data[7,:]
 
-    leng = mjd.shape[0]
+    leng = mjd.shape[0]box x range in plot
     ra = np.zeros((20,leng))
-    de = np.zeros((20,leng))
+    dec= np.zeros((20,leng))
     az = np.zeros((20,leng))
     el = np.zeros((20,leng))
 

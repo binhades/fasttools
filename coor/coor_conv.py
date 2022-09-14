@@ -142,11 +142,14 @@ def epoch_obs_to_J2000(ra,dec,mjd):
 #    return ha,dec
 # ---------------------------------
    
-def coor_conv_multibeam(mjd,beam_id,x,y,z,Yaw,Pitch,Roll,multibeamAngle):
+def coor_conv_multibeam(mjd,beam_id,x0,y0,z0,Yaw,Pitch,Roll,multibeamAngle):
 
     beam_idx = np.arange(19)+1
 
-    x,y,z = kypara2xyz_MultiBeam(beam_id,x,y,z, Yaw, Pitch, Roll, multibeamAngle)         # units in degrees
+    x,y,z = kypara2xyz_MultiBeam(beam_id,x0,y0,z0, Yaw, Pitch, Roll, multibeamAngle)         # units in degrees
+    x = np.array(x).astype(np.float64) # must convert, otherwise ufunc error.
+    y = np.array(y).astype(np.float64)
+    z = np.array(z).astype(np.float64)
     az,el = xyz2azel(x,y,z) # units in degrees
     ra,dec = azel2radec(az,el,mjd)
 

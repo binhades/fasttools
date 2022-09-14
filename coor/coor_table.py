@@ -69,6 +69,9 @@ def csv_load(file_xyz,delimiter=',', delta=True):
     z=[]
     rot_SDP=[] # measure
     delta_rot = [] # measure - theory
+    Yaw=[]
+    Pitch=[]
+    Roll=[] 
 
     with open(file_xyz,'rt') as filein:
 
@@ -79,14 +82,17 @@ def csv_load(file_xyz,delimiter=',', delta=True):
             y.append(float(row['SDP_PhaPos_Y']))
             z.append(float(row['SDP_PhaPos_Z']))
             rot_SDP.append(float(row['SDP_AngleM']))
+            Yaw.append(float(row['SDP_SwtDPose_Y']))
+            Pitch.append(float(row['SDP_SwtDPose_P']))
+            Roll.append(float(row['SDP_SwtDPose_R']))
             delta_rot.append(float(row['SDP_AngleM']) - float(row['TRP_AngleM']))
             ctime = row['SysTime']
             mjd.append(ctime2mjd(ctime))
 
     if delta:
-        return np.array([mjd,x,y,z,delta_rot])
+        return np.array([mjd,x,y,z,delta_rot,Yaw,Pitch,Roll])
     else:
-        return np.array([mjd,x,y,z,rot_SDP])
+        return np.array([mjd,x,y,z,rot_SDP,Yaw,Pitch,Roll])
 
 
 def csv_write(rows,fileout,delimiter=','):
@@ -218,6 +224,37 @@ def coor_table(file_xyz,fileout='coor_table.csv', delimiter=',', rot_log=None, r
         coor = [mjd, ra_c, dec_c, az_c, el_c]
 
     return coor
+
+def coor_table_multibeam(file_xyz, fileout='coor_table.csv', delimiter=',', nowt=False):
+    # 2022.09.14
+    # updated based on the code adapted from HiFAST
+
+    data = csv_load(file_xyz,delimiter=delimiter,delta=False)
+
+    mjd            = data[0,:]
+    x              = data[1,:]
+    y              = data[2,:]
+    z              = data[3,:]
+    multibeamAngle = data[4,:]
+    Yaw            = data[5,:]
+    Pitch          = data[6,:]
+    Roll           = data[7,:]
+
+    leng = mjd.shape[0]
+    ra = np.zeros((20,leng))
+    de = np.zeros((20,leng))
+    az = np.zeros((20,leng))
+    el = np.zeros((20,leng))
+
+    for i in range(19):
+        beam_id = i+1
+        ra[i,:], dec[i,:], az[i,:], el[i,:] = coor_conv_multibeam(mjd, beam_id, x, y, z, Yaw, Pitch, Roll, multibeamAngle)
+
+    coor_dict = data2dict(mjd,ra,dec,az,el)
+    if not nowt:
+        csv_write(coor_dict,fileout)
+
+    return coor_dict
 
 def field_rotation(az, dec, el=None, mjd=None):
 

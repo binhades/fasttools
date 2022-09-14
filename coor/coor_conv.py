@@ -7,13 +7,13 @@ from astropy.coordinates import SkyCoord, AltAz #, HADec
 from astropy import units as u
 from astropy.time import Time
 from ..location import get_fast_location
+import numpy as np
 
 #from astropy.utils import iers 
 # to replace the default url to : http://maia.usno.navy.mil/ser7/finals2000A.all
 #iers.conf.iers_auto_url =  'http://jlrat.bao.ac.cn/~bliu/doc/finals2000A.all'
     
 def xyz2azel(x,y,z):
-    import numpy as np
     # check if x,y,z are scalars or 1d array with same length.
     R = np.sqrt(x**2+y**2+z**2)
     az = np.degrees(np.arctan2(-x, -y))
@@ -140,3 +140,123 @@ def epoch_obs_to_J2000(ra,dec,mjd):
 #
 #    return ha,dec
 # ---------------------------------
+   
+def coor_conv_multibeam(mjd,beam_id,x,y,z,Yaw,Pitch,Roll,multibeamAngle):
+
+    beam_idx = np.arange(19)+1
+
+    az,el = xyz2azel_multibeam(beam_id,x,y,z, Yaw, Pitch, Roll, multibeamAngle)         # units in degrees
+    az = np.array(az, dtype='float64')
+    el = np.array(el, dtype='float64')
+
+    ra,dec = azel2radec(az,el,mjd)
+
+    return ra,dec,az,el
+
+# Following code: adapted from HiFAST, which adapted from FAST_ResultDataInversTool.exe 
+    
+def kypara2AzEl(nB, globalCenterX, globalCenterY, globalCenterZ, globalYaw, globalPitch, globalRoll, multibeamAngle):
+    """
+    return Az: Azimuth in radian, El: Elevation
+    """
+    feedLocalCoord = [  [ 0.0  , 0.0  , 0.0   ],
+                        [ -0.27, 0.0, 0.0],
+                        [ -0.135, 0.233826859, 0.0],
+                        [ 0.135, 0.233826859, 0.0],
+                        [ 0.27, 0.0, 0.0],
+                        [ 0.135, -0.233826859, 0.0],
+                        [ -0.135, -0.233826859, 0.0],
+                        [ -0.54, 0.0, 0.0],
+                        [ -0.405, 0.233826859, 0.0],
+                        [ -0.27, 0.467653718, 0.0],
+                        [ 0.0, 0.467653718, 0.0],
+                        [ 0.27, 0.467653718, 0.0],
+                        [ 0.405, 0.233826859, 0.0],
+                        [ 0.54, 0.0, 0.0],
+                        [ 0.405, -0.233826859, 0.0],
+                        [ 0.27, -0.467653718, 0.0],
+                        [ 0.0, -0.467653718, 0.0],
+                        [ -0.27, -0.467653718, 0.0],
+                        [ -0.405, -0.233826859, 0.0] ]
+
+    #1.多波束转角带来的旋转
+    rotationMatrixMultiBeam= CalMultiBeamRotationMatrix(multibeamAngle)
+
+    #2.Stewart下平台带来的旋转、
+    rotationMatrixPlatform= CalPlatformRotationMatrix(globalYaw, globalPitch, globalRoll)
+
+    #3.计算旋转后的位置
+    useFeed = feedLocalCoord[nB-1]
+    posRelative = VectorTransform(rotationMatrixPlatform, VectorTransform(rotationMatrixMultiBeam, useFeed))
+
+    #4.计算全局坐标
+    posAbsolute = posRelative + np.array([globalCenterX,  globalCenterY, globalCenterZ])
+
+    #5.计算地平坐标
+    #Az
+    Az = math.atan2(-posAbsolute[0], -posAbsolute[1])
+    #El
+    El = math.pi/2 - math.atan2(math.sqrt(posAbsolute[0]**2 + posAbsolute[1] **2), -posAbsolute[2])
+    
+    return Az, El
+
+xyz2AzEl_MultiBeam = np.frompyfunc(kypara2AzEl, 8, 2)
+
+
+#other functions
+#从多波束转角计算旋转矩阵
+def CalMultiBeamRotationMatrix(multibeamAngle):          
+    """
+    multibeamAngle: scalar  float64  Radian 
+    """    
+    ca= math.cos(multibeamAngle) 
+    sa= math.sin(multibeamAngle) 
+    rotationMatrixMultiBeam= np.zeros((3,3), dtype='float64')
+    
+    rotationMatrixMultiBeam[0,0] = ca 
+    rotationMatrixMultiBeam[0,1] = -sa 
+    rotationMatrixMultiBeam[0,2] = 0.0 
+    rotationMatrixMultiBeam[1,0] = sa 
+    rotationMatrixMultiBeam[1,1] = ca 
+    rotationMatrixMultiBeam[1,2] = 0.0 
+    rotationMatrixMultiBeam[2,0] = 0.0 
+    rotationMatrixMultiBeam[2,1] = 0.0 
+    rotationMatrixMultiBeam[2,2] = 1.0 
+    return rotationMatrixMultiBeam
+
+#从偏航、俯仰、翻滚计算旋转矩阵。
+def CalPlatformRotationMatrix(globalYaw, globalPitch, globalRoll):
+    """
+    globalYaw, globalPitch, globalRoll: scalar  float64
+    """
+    
+    cy = math.cos(globalYaw) 
+    sy = math.sin(globalYaw) 
+    cp = math.cos(globalPitch) 
+    sp = math.sin(globalPitch) 
+    cr = math.cos(globalRoll) 
+    sr = math.sin(globalRoll) 
+    
+    rotationMatrixPlatform = np.zeros((3,3), dtype='float64')
+    rotationMatrixPlatform[0,0] = cy * cp 
+    rotationMatrixPlatform[0,1] = cy * sp * sr - sy * cr 
+    rotationMatrixPlatform[0,2] = sy * sr + cy * sp * cr 
+    rotationMatrixPlatform[1,0] = sy * cp 
+    rotationMatrixPlatform[1,1] = cy * cr + sy * sp * sr 
+    rotationMatrixPlatform[1,2] = sy * sp * cr - cy * sr 
+    rotationMatrixPlatform[2,0] = -sp 
+    rotationMatrixPlatform[2,1] = cp * sr 
+    rotationMatrixPlatform[2,2] = cp * cr 
+        
+    return rotationMatrixPlatform
+
+def VectorTransform(matrixA, vectorB):
+    """
+    """ 
+    
+    m11 = matrixA[0, 0] * vectorB[0] + matrixA[0, 1] * vectorB[1] + matrixA[0, 2] * vectorB[2]
+    m21 = matrixA[1, 0] * vectorB[0] + matrixA[1, 1] * vectorB[1] + matrixA[1, 2] * vectorB[2]
+    m31 = matrixA[2, 0] * vectorB[0] + matrixA[2, 1] * vectorB[1] + matrixA[2, 2] * vectorB[2]
+
+   
+    return  np.array([m11, m21, m31])

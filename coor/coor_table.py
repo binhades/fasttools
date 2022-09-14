@@ -240,7 +240,7 @@ def coor_table_multibeam(file_xyz, fileout='coor_table.csv', delimiter=',', nowt
     Pitch          = data[6,:]
     Roll           = data[7,:]
 
-    leng = mjd.shape[0]box x range in plot
+    leng = mjd.shape[0]
     ra = np.zeros((20,leng))
     dec= np.zeros((20,leng))
     az = np.zeros((20,leng))
